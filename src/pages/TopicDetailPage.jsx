@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Scale, BookOpen, Sparkles, ChevronRight, 
-  ExternalLink, HelpCircle, CheckCircle2, FileText, Landmark 
+  ExternalLink, HelpCircle, CheckCircle2, FileText, Landmark, ArrowUpRight 
 } from 'lucide-react';
 import { LEGAL_TOPICS, VERIFIED_KNOWLEDGE_BASE } from '../data/mockLegalData';
 
@@ -18,119 +18,147 @@ export const TopicDetailPage = () => {
 
   return (
     <div className="topic-detail-page animate-fade-in">
-      <div className="container container-narrow">
+      <div className="container">
         
-        {/* Navigation */}
-        <div className="detail-top-nav">
-          <Link to="/topics" className="btn btn-ghost btn-sm">
-            <ArrowLeft size={16} /> Back to All Topics
-          </Link>
-        </div>
+        {/* Breadcrumb Navigation */}
+        <nav className="detail-breadcrumbs" aria-label="Breadcrumb">
+          <Link to="/" className="breadcrumb-link">Home</Link>
+          <span className="breadcrumb-separator">/</span>
+          <Link to="/topics" className="breadcrumb-link">Legal Topics</Link>
+          <span className="breadcrumb-separator">/</span>
+          <span className="breadcrumb-current">{topic.title}</span>
+        </nav>
 
         {/* Hero Card */}
         <div className="topic-detail-hero card">
-          <div className="topic-detail-header">
-            <span className="badge badge-primary">Legal Category Guide</span>
-            <h1 className="topic-detail-title">{topic.title}</h1>
-            <p className="topic-detail-desc">{topic.description}</p>
-          </div>
+          <div className="topic-detail-header-flex">
+            <div className="topic-detail-header-left">
+              <span className="badge badge-primary">Legal Category Guide</span>
+              <h1 className="topic-detail-title">{topic.title}</h1>
+              <p className="topic-detail-desc">{topic.description}</p>
+            </div>
 
-          <div className="topic-hero-cta-strip">
-            <Link 
-              to="/analyze" 
-              className="btn btn-primary"
-            >
-              <Sparkles size={16} /> Analyze a {topic.title} Issue
-            </Link>
-          </div>
-        </div>
-
-        {/* Common Citizen Scenarios */}
-        <div className="topic-detail-section">
-          <h2 className="section-block-title">Common Situations in {topic.title}</h2>
-          <p className="section-block-desc">
-            Click any common situation to start an analysis with pre-filled context:
-          </p>
-
-          <div className="scenarios-grid">
-            {topic.popularQuestions.map((q, idx) => (
-              <div 
-                key={idx}
-                className="scenario-item-card card card-interactive"
-                onClick={() => navigate('/analyze', { state: { prefill: q } })}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate('/analyze', { state: { prefill: q } })}
+            <div className="topic-detail-header-right">
+              <button 
+                type="button"
+                className="btn btn-primary btn-lg detail-analyze-cta"
+                onClick={() => navigate('/analyze', { state: { prefill: topic.popularQuestions[0] } })}
               >
-                <div className="scenario-item-content">
-                  <HelpCircle size={18} className="scenario-item-icon" />
-                  <span className="scenario-item-text">{q}</span>
-                </div>
-                <ChevronRight size={16} className="scenario-arrow" />
-              </div>
-            ))}
+                <Sparkles size={18} />
+                <span>Analyze a {topic.title} Issue</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Primary Governing Acts */}
-        <div className="topic-detail-section">
-          <h2 className="section-block-title">Primary Governing Indian Statutes</h2>
-          <p className="section-block-desc">
-            Central and State legislative frameworks governing disputes in this domain:
-          </p>
-
-          <div className="acts-list">
-            {topic.primaryActs.map((act, idx) => (
-              <div key={idx} className="act-info-card card">
-                <div className="act-info-header">
-                  <Landmark size={20} className="act-landmark-icon" />
-                  <div>
-                    <h3 className="act-title">{act}</h3>
-                    <span className="badge badge-success mt-1">Official Central/State Act</span>
-                  </div>
-                </div>
-                <p className="act-description-text">
-                  Enacted by Parliament of India or State Legislatures. Governs contractual obligations, regulatory compliance, and statutory remedies.
+        {/* Responsive 2-Column Section on Desktop / Stacked on Mobile */}
+        <div className="topic-detail-columns-grid">
+          
+          {/* Column 1: Common Citizen Scenarios */}
+          <div className="topic-detail-col">
+            <div className="detail-section-header">
+              <HelpCircle size={20} className="detail-header-icon" />
+              <div>
+                <h2 className="section-block-title">Common Situations in {topic.title}</h2>
+                <p className="section-block-desc">
+                  Select any common dispute to launch an instant statutory analysis:
                 </p>
-                <div className="act-links-footer">
-                  <a 
-                    href="https://www.indiacode.nic.in" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="act-external-link"
-                  >
-                    <span>Read Full Act on India Code</span>
-                    <ExternalLink size={13} />
-                  </a>
-                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Verified Knowledge Base Provisions */}
-        {relevantKbItems.length > 0 && (
-          <div className="topic-detail-section">
-            <h2 className="section-block-title">Verified Provisions on File</h2>
-            <div className="kb-provisions-list">
-              {relevantKbItems.map((item) => (
-                <div key={item.id} className="kb-provision-card card">
-                  <div className="kb-prov-top">
-                    <span className="law-section-badge">{item.section}</span>
-                    <h4 className="kb-prov-act">{item.act}</h4>
+            <div className="scenarios-vertical-list">
+              {topic.popularQuestions.map((q, idx) => (
+                <div 
+                  key={idx}
+                  className="scenario-detail-card card card-interactive"
+                  onClick={() => navigate('/analyze', { state: { prefill: q } })}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate('/analyze', { state: { prefill: q } })}
+                >
+                  <div className="scenario-detail-content">
+                    <span className="scenario-idx-pill">{idx + 1}</span>
+                    <span className="scenario-detail-text">{q}</span>
                   </div>
-                  <h5 className="kb-prov-title">{item.sectionTitle}</h5>
-                  <p className="kb-prov-summary">{item.summary}</p>
-                  <div className="kb-prov-footer">
-                    <span className="badge badge-neutral">{item.jurisdiction}</span>
+                  <div className="scenario-detail-arrow">
+                    <ArrowUpRight size={16} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 2: Governing Indian Statutes */}
+          <div className="topic-detail-col">
+            <div className="detail-section-header">
+              <Landmark size={20} className="detail-header-icon" />
+              <div>
+                <h2 className="section-block-title">Primary Governing Enactments</h2>
+                <p className="section-block-desc">
+                  Statutory codes enacted by the Indian Parliament & State Assemblies:
+                </p>
+              </div>
+            </div>
+
+            <div className="acts-vertical-list">
+              {topic.primaryActs.map((act, idx) => (
+                <div key={idx} className="act-detail-card card">
+                  <div className="act-detail-top">
+                    <span className="badge badge-success">Official Statute</span>
                     <a 
-                      href={item.officialUrl} 
+                      href="https://www.indiacode.nic.in" 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="btn btn-outline btn-sm"
+                      className="act-external-repo-link"
                     >
-                      Official Source <ExternalLink size={12} />
+                      <span>India Code ↗</span>
                     </a>
+                  </div>
+                  <h3 className="act-detail-title">{act}</h3>
+                  <p className="act-detail-description">
+                    Statutory framework establishing rights, covenants, liabilities, and legal remedies.
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Section: Verified Knowledge Base Provisions on File */}
+        {relevantKbItems.length > 0 && (
+          <div className="topic-kb-section">
+            <div className="detail-section-header">
+              <BookOpen size={20} className="detail-header-icon" />
+              <div>
+                <h2 className="section-block-title">Verified Provisions on File</h2>
+                <p className="section-block-desc">
+                  Statutory sections from our verified legal database matching {topic.title}:
+                </p>
+              </div>
+            </div>
+
+            <div className="kb-provisions-grid">
+              {relevantKbItems.map((item) => (
+                <div key={item.id} className="kb-item-card card">
+                  <div className="kb-item-header">
+                    <span className="law-section-badge">{item.section}</span>
+                    <h3 className="kb-item-act">{item.act}</h3>
+                  </div>
+                  <h4 className="kb-item-title">{item.sectionTitle}</h4>
+                  <p className="kb-item-summary">{item.summary}</p>
+                  <div className="kb-item-footer">
+                    <span className="badge badge-neutral">{item.jurisdiction}</span>
+                    {item.officialUrl && (
+                      <a 
+                        href={item.officialUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-outline btn-sm"
+                      >
+                        India Code <ExternalLink size={12} />
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
